@@ -1,0 +1,10 @@
+---
+title: "Day 8 interactive session"
+author: "Leilanie Rubinstein"
+format: html
+execute: 
+  warning: false
+editor_options: 
+  chunk_output_type: console
+---
+
