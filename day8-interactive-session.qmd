@@ -8,3 +8,180 @@ editor_options:
   chunk_output_type: console
 ---
 
+```{r}
+library(tidyverse)
+library(here)
+library(janitor)
+
+install.packages("patchwork")
+install.packages("ggrepel")
+install.packages("gghighlight")
+install.packages("paletteer")
+install.packages("ggExtra")
+install.packages("ggbeeswarm")
+install.packages("gapminder")
+install.packages("sf")
+```
+
+```{r}
+library(patchwork)
+library(ggrepel)
+library(gghighlight)
+library(paletteer)
+library(ggExtra)
+library(ggbeeswarm)
+library(gapminder)
+library(sf)
+```
+
+# Lizards
+
+```{r}
+lizards <- read_csv(here::here("data_tidy", "lizards.csv"), show_col_types = FALSE)
+```
+
+```{r}
+# ggplot thinks about data visualization in layers
+
+ggplot(data = lizards, aes(x = total_length, y = weight)) + # defining axes
+  geom_point() + 
+  geom_line()
+  
+# identical
+ggplot(data = lizards) +
+  geom_point(aes(x = total_length, y = weight))
+
+# another way, can change the data and the aesthetics
+ggplot() + # anything you pass into ggplot applies to the entire graphic
+  geom_point(data = lizards, aes(x = total_length, y = weight))
+```
+
+```{r}
+# not every data type requires multiple aesthetics
+ggplot(data = lizards, aes(x = total_length)) + 
+  geom_histogram(binwidth = 10)
+```
+
+```{r}
+ggplot(data = lizards, aes(y = common_name, x = weight)) +
+  geom_jitter()
+# + geom_point() will place them all on one line, making things hard to see
+```
+
+```{r}
+ggplot(data = lizards, aes(x = weight)) + 
+  geom_histogram(color = "orange", # outline of the geometry
+                 fill = "purple", # what the item itself is color
+                 linewidth = 2, # changes thickness of the line
+                 linetype = "dotted") # changes line type
+```
+
+```{r}
+# coolors.co
+ggplot(data = lizards, aes(x = total_length, y = weight)) + 
+  geom_point(color = "#FF6392",
+             fill = "#420039",
+             shape = 22,
+             size = 10,
+             alpha = 0.5)
+```
+
+```{r}
+# updating an aesthetic based on a variable
+ggplot(data = lizards, aes(x = total_length, y = weight)) +
+  geom_point(aes(color = common_name,
+                 size = total_length),
+             alpha = 0.8) +
+  scale_color_brewer(palette = "Set3") # color brewer is a set of custom palettes
+
+ggplot(data = lizards, aes(x = total_length, y = weight)) +
+  geom_point(aes(color = common_name,
+                 size = total_length),
+             alpha = 1) +
+  scale_color_discrete(type = c("503D3F", "615756", "5A786F", "539987", "53CCA0", "53E6AC", "52FFB8")) # need same number of colors as species
+```
+
+```{r}
+# updating theme
+ggplot(data = lizards, aes(x = site, y = weight)) + 
+  geom_jitter(aes(color = common_name)) +
+  theme_light()
+```
+
+```{r}
+# Axis labels
+ggplot(data = lizards, aes(x = total_length, y = weight)) + 
+  geom_point() +
+  labs(x = "Total length (mm)",
+       y = "Weight (g)",
+       title = "Lizard Size")
+# moving or manipulating anything that isn't data happens in `theme_()`
+```
+
+```{r}
+# Faceting to create multiple panels at once
+ggplot(data = lizards, aes(x = total_length, y = weight)) +
+  geom_point() +
+  facet_wrap(~common_name, ncol = 3, scales = "free") + # three variables to display: 1) total length, 2) weight, 3) species
+  # scales free allows the axes ranges to be different, without it the axes ranges will be the same
+  labs(x = "total length (mm)",
+       y = "weigh (g)",
+       title = "Lizard Sizes")
+```
+
+```{r}
+ggplot(data = lizards, aes(x = total_length, y = weight)) +
+  geom_point() +
+  facet_grid(sex ~ tail)
+# subsets data based on sex and tail, didn't have to mess with our data
+```
+
+```{r}
+# ggplot will default to putting things in alphabetical order
+
+lizard_counts <- lizards %>%
+  dplyr::count(common_name)
+
+ggplot(data = lizard_counts, aes(y = common_name, x = n)) +
+  geom_col()
+
+ggplot(data = lizard_counts, aes(y = fct_reorder(common_name, n), 
+                                 x = n)) +
+  geom_col()
+
+# keeping data as-is and manipulating data in ggplot is ideal
+```
+
+```{r}
+# review of basics
+
+ggplot(data = lizards, aes(x = total_length, y = weight)) +
+  geom_point(aes(color = common_name, shape = common_name), size = 2) +
+  theme_light() +
+  labs(x = "total length (mm)",
+       y = "weight (g)",
+       title = "Lizard Sizes",
+       color = "lizard species") +
+  facet_wrap(~common_name, scales = "free")
+
+# can import png files and use them as symbols!
+```
+
+```{r}
+ggplot(data = lizards, aes(y = fct_infreq(common_name))) + 
+  geom_bar(aes(fill = site)) +
+  theme_light() + 
+  labs(x = "lizard counts",
+       y = "species (common name)") +
+  facet_grid(sex ~ tail) + 
+  theme_light()
+
+# `geom_bar()` makes the bar size proportional to the counts, `geom_col()` requires an x
+```
+
+
+
+
+
+
+
