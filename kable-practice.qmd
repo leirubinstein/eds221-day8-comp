@@ -1,0 +1,24 @@
+---
+title: "Table examples"
+author: "Leilanie Rubinstein"
+format: html
+execute: 
+  warning: false
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r}
+library(tidyverse)
+library(kableExtra)
+library(palmerpenguins)
+```
+
+```{r}
+penguins %>%
+  dplyr::group_by(species, island) %>%
+  dplyr::summarise(mean_mass = mean(body_mass_g, na.rm = TRUE)) %>%
+  kable(col.names = c("species", "Island", "Body mass (g)")) %>%
+  kable_styling(bootstrap_options = "striped", full_width = FALSE) # full width will make it as wide as the entire document
+```
+
